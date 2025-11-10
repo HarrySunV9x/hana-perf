@@ -1,0 +1,18 @@
+{
+  "activity_mapping": {
+    "com.android.launcher/com.android.launcher.Launcher": "🏠 桌面",
+    "com.tencent.mm/com.tencent.mm.ui.LauncherUI": "📱 微信主界面",
+    "com.tencent.mm/com.tencent.mm.plugin.finder.ui.FinderHomeAffinityUI": "📱 微信视频号首页",
+    "com.tencent.mm/com.tencent.mm.plugin.appbrand.launching.AppBrandLaunchProxyUI": "📱 微信小程序启动代理",
+    "com.tencent.mm/com.tencent.mm.plugin.appbrand.ui.AppBrandPluginUI": "📱 微信小程序",
+    "com.coolapk.market/com.coolapk.market.view.main.MainActivity": "📦 酷安主页",
+    "com.jingdong.app.mall/com.jd.lib.productdetail.ProductDetailActivity": "🛒 京东商品详情页",
+    "com.teamtalk.im/com.kdweibo.android.ui.fragment.HomeMainFragmentActivity": "💬 TeamTalk主页"
+  },
+  "special_windows": {
+    "recents_animation_input_consumer": "🔄 多任务",
+    "NotificationShade": "🔔 通知栏",
+    "OplusChargeAnimationView": "🔋 充电动画"
+  }
+}
+
