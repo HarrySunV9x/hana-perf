@@ -6,16 +6,16 @@ from .log import logger
 
 def filter_logs(file_path: str, filter_str: str, timestamp: str, time_window: float = 1.0) -> list[str]:
     """
-    Filter logs from a file based on a filter string and a time range.
+    # 根据过滤字符串和时间窗口，从文件中过滤日志。
 
-    Args:
-        file_path: The path to the log file.
-        filter_str: The string to filter the logs.
-        timestamp: The timestamp to filter around, format: "MM-DD HH:MM:SS.ffffff"
-        time_window: Time window in seconds around the timestamp (default: 1.0 second)
+    # 参数说明:
+    #   file_path: 日志文件路径（字符串格式）。
+    #   filter_str: 用于过滤日志的关键字字符串。
+    #   timestamp: 目标时间戳，格式为 "MM-DD HH:MM:SS.ffffff"。
+    #   time_window: 以秒为单位的时间窗口（默认为1.0秒），在 timestamp 前后各 time_window/2 的范围内查找。
 
-    Returns:
-        A list of logs that match the filter string and time range.
+    # 返回值:
+    #   返回匹配关键字且时间范围符合的日志行列表。
     """
     # 验证文件存在
     if not Path(file_path).exists():
@@ -50,23 +50,19 @@ def filter_logs(file_path: str, filter_str: str, timestamp: str, time_window: fl
                 continue
             
             # 2. 然后按时间范围过滤
-            # 提取时间戳（支持常见的 Android 日志格式）
-            # 格式: "10-28 09:27:29.665281" 或 "09:27:29.665281"
-            time_match = re.search(r'(\d{2}-\d{2}\s+)?(\d{2}:\d{2}:\d{2}\.\d+)', line)
+            # 提取时间戳（Android 日志格式）
+            # 格式: "10-28 09:27:29.665281"
+            time_match = re.search(r'(\d{2}-\d{2}\s+)(\d{2}:\d{2}:\d{2}\.\d+)', line)
             
             if time_match:
                 try:
                     time_str = time_match.group(0)
-                    if '-' in time_str:
-                        # 完整格式 "10-28 09:27:29.665281"
-                        log_time = datetime.strptime(time_str, '%m-%d %H:%M:%S.%f')
-                        log_time = log_time.replace(year=datetime.now().year)
-                        # 比较完整的日期时间
-                        if start_time <= log_time <= end_time:
-                            filtered_logs.append(line)
-                    else:
-                        # 只有时间 "09:27:29.665281"，跳过（因为现在只支持完整格式）
-                        continue
+                    # 解析完整格式 "10-28 09:27:29.665281"
+                    log_time = datetime.strptime(time_str, '%m-%d %H:%M:%S.%f')
+                    log_time = log_time.replace(year=datetime.now().year)
+                    # 比较完整的日期时间
+                    if start_time <= log_time <= end_time:
+                        filtered_logs.append(line)
                 except ValueError:
                     # 时间解析失败，跳过此行
                     continue

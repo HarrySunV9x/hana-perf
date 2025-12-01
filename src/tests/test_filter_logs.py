@@ -1,3 +1,13 @@
+"""
+@author: HarrySunV9x
+@date: 2025-12-02
+@description: filter_logs 函数测试, 包含：
+1. 关键字过滤
+2. 时间戳格式错误（缺少月-日）
+3. 无匹配情况
+4. 文件不存在
+"""
+
 import pytest
 import tempfile
 from pathlib import Path
@@ -73,7 +83,7 @@ class TestFilterLogs:
         result = filter_logs(
             file_path=sample_log_file,
             filter_str="input_focus:",
-            timestamp="09:27:51.746979",
+            timestamp="10-28 09:27:51.746979",
             time_window=2.0
         )
         
@@ -88,13 +98,26 @@ class TestFilterLogs:
         # 应该找到时间范围内的日志
         assert len(result) == 9
         assert all("input_focus:" in line for line in result)
+
+    def test_filter_by_keyword_no_month(self, sample_log_file):
+        """测试时间戳格式错误（缺少月-日）"""
+        with pytest.raises(ValueError) as exc_info:
+            filter_logs(
+                file_path=sample_log_file,
+                filter_str="input_focus:",
+                timestamp="09:27:51.746979",
+                time_window=2.0
+            )
+        
+        # 可选：验证异常消息内容
+        assert "Invalid timestamp format: 09:27:51.746979. Expected 'MM-DD HH:MM:SS.ffffff'" in str(exc_info.value)
     
     def test_filter_no_match(self, sample_log_file):
         """测试无匹配情况"""
         result = filter_logs(
             file_path=sample_log_file,
             filter_str="NOTEXIST",
-            timestamp="09:27:29.665281"
+            timestamp="10-28 09:27:29.665281"
         )
         
         assert len(result) == 0
@@ -105,8 +128,9 @@ class TestFilterLogs:
             filter_logs(
                 file_path="not_exist.txt",
                 filter_str="ERROR",
-                timestamp="09:27:29.665281"
+                timestamp="10-28 09:27:29.665281"
             )
+        assert f"Log file not found: not_exist.txt"
 
 # 单独运行此测试文件
 if __name__ == "__main__":
