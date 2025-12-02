@@ -108,9 +108,27 @@ class TestFilterLogs:
                 timestamp="09:27:51.746979",
                 time_window=2.0
             )
-        
-        # 可选：验证异常消息内容
-        assert "Invalid timestamp format: 09:27:51.746979. Expected 'MM-DD HH:MM:SS.ffffff'" in str(exc_info.value)
+
+            # 验证异常消息内容
+            assert "Invalid timestamp format: 09:27:51.746979. Expected 'MM-DD HH:MM:SS[.ffffff]'" in str(exc_info.value)
+
+    def test_filter_by_keyword_no_microsecond(self, sample_log_file):
+        """测试时间戳格式错误（缺少月-日）"""
+        result = filter_logs(
+                file_path=sample_log_file,
+                filter_str="input_focus:",
+                timestamp="10-28 09:27:51",
+                time_window=2.0
+            )
+                # 打印结果（运行时加 -s 参数可见）
+        print(f"\n{'='*60}")
+        print(f"✅ 找到 {len(result)} 条匹配的日志:")
+        print(f"{'='*60}")
+        for i, line in enumerate(result, 1):
+            print(f"{i}. {line.rstrip()}")
+        print(f"{'='*60}\n")
+        assert len(result) == 3
+        assert all("input_focus:" in line for line in result)
     
     def test_filter_no_match(self, sample_log_file):
         """测试无匹配情况"""

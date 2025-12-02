@@ -21,11 +21,15 @@ def filter_logs(file_path: str, filter_str: str, timestamp: str, time_window: fl
     if not Path(file_path).exists():
         raise FileNotFoundError(f"Log file not found: {file_path}")
     
-    # 解析目标时间（只接受完整格式 "MM-DD HH:MM:SS.ffffff"）
+    # 解析目标时间，支持 "MM-DD HH:MM:SS.ffffff" 或 "MM-DD HH:MM:SS" 格式
     try:
-        # 检查是否为完整格式
+        # 检查基本格式
         if ' ' not in timestamp or '-' not in timestamp.split()[0]:
-            raise ValueError(f"Invalid timestamp format: {timestamp}. Expected 'MM-DD HH:MM:SS.ffffff'")
+            raise ValueError(f"Invalid timestamp format: {timestamp}. Expected 'MM-DD HH:MM:SS[.ffffff]'")
+        
+        # 如果没有微秒部分，自动补上 .000000
+        if '.' not in timestamp:
+            timestamp = timestamp + '.000000'
         
         # 解析完整日期时间格式 "10-28 09:27:29.665281"
         target_time = datetime.strptime(timestamp, '%m-%d %H:%M:%S.%f')
@@ -33,7 +37,7 @@ def filter_logs(file_path: str, filter_str: str, timestamp: str, time_window: fl
         target_time = target_time.replace(year=datetime.now().year)
     except ValueError as e:
         logger.error(f"Invalid timestamp format: {timestamp}, error: {e}")
-        raise ValueError(f"Invalid timestamp format: {timestamp}. Expected 'MM-DD HH:MM:SS.ffffff'")
+        raise ValueError(f"Invalid timestamp format: {timestamp}. Expected 'MM-DD HH:MM:SS[.ffffff]'")
     
     # 计算时间范围
     start_time = target_time - timedelta(seconds=time_window / 2)
