@@ -3,6 +3,7 @@ from common.log import logger
 from pathlib import Path
 from datetime import datetime
 import json
+import os
 
 @mcp.tool()
 async def generate_scene_report(
@@ -48,210 +49,40 @@ async def generate_scene_report(
     safe_timestamp = timestamp.replace(":", "-").replace(" ", "_").replace(".", "-")
     html_file = html_output_dir / f"scene_analysis_{safe_timestamp}.html"
     
-    # 生成 HTML 内容
-    html_content = f"""<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>场景分析报告 - {timestamp}</title>
-    <style>
-        body {{
-            font-family: 'Segoe UI', Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-            line-height: 1.6;
-        }}
-        .header {{
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }}
-        .section {{
-            background: white;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }}
-        h1, h2, h3 {{
-            margin-top: 0;
-        }}
-        .file-section {{
-            background: #f8f9fa;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border-left: 4px solid #667eea;
-        }}
-        pre {{
-            background: #2d2d2d;
-            color: #f8f8f2;
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-            font-size: 12px;
-            line-height: 1.5;
-            max-height: 400px;
-            overflow-y: auto;
-        }}
-        .meta {{
-            color: #666;
-            font-size: 14px;
-        }}
-        .stats {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }}
-        .stat-card {{
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-        }}
-        .stat-value {{
-            font-size: 32px;
-            font-weight: bold;
-        }}
-        .stat-label {{
-            font-size: 14px;
-            opacity: 0.9;
-        }}
-        .analysis-section {{
-            background: #fff9e6;
-            border-left: 4px solid #ffc107;
-            padding: 20px;
-        }}
-        .timeline {{
-            position: relative;
-            padding-left: 30px;
-        }}
-        .timeline-item {{
-            position: relative;
-            padding-bottom: 20px;
-            border-left: 2px solid #667eea;
-            padding-left: 25px;
-            margin-left: 10px;
-        }}
-        .timeline-item::before {{
-            content: '';
-            position: absolute;
-            left: -7px;
-            top: 0;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #667eea;
-        }}
-        .timeline-time {{
-            font-weight: bold;
-            color: #667eea;
-            font-size: 14px;
-        }}
-        .timeline-event {{
-            margin-top: 5px;
-            color: #333;
-        }}
-        .highlight {{
-            background: #fff3cd;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }}
-        table {{
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }}
-        th, td {{
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-        }}
-        th {{
-            background-color: #667eea;
-            color: white;
-        }}
-        tr:nth-child(even) {{
-            background-color: #f8f9fa;
-        }}
-        .conclusion-box {{
-            background: linear-gradient(135deg, #667eea22 0%, #764ba233 100%);
-            padding: 20px;
-            border-radius: 8px;
-            border: 2px solid #667eea;
-            margin-top: 15px;
-        }}
-        .conclusion-box h3 {{
-            margin-top: 0;
-            color: #667eea;
-        }}
-        .placeholder {{
-            background: #fff3cd;
-            padding: 15px;
-            border-radius: 5px;
-            border-left: 4px solid #ffc107;
-            margin: 15px 0;
-        }}
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>📊 场景分析报告</h1>
-        <p class="meta">时间点: {timestamp} | 时间窗口: ±{time_window/2}秒</p>
-    </div>
+    # 读取 HTML 模板
+    template_path = Path(__file__).parent / "templates" / "scene_report_template.html"
+    try:
+        with open(template_path, 'r', encoding='utf-8') as f:
+            html_template = f.read()
+    except FileNotFoundError:
+        return f"❌ HTML 模板文件不存在: {template_path}"
     
-    <div class="section">
-        <h2>📈 统计信息</h2>
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-value">{total_files}</div>
-                <div class="stat-label">Events 文件</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">{total_logs}</div>
-                <div class="stat-label">日志条目</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">{time_window}s</div>
-                <div class="stat-label">时间窗口</div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- SCENE_ANALYSIS_PLACEHOLDER -->
-    
-    <div class="section">
-        <h2>📝 原始日志</h2>
-"""
-    
-    # 按文件添加日志内容
+    # 生成日志部分的 HTML
+    log_sections_html = ""
     for file_path, logs in file_logs_map.items():
         log_content = "".join(logs[:200])
         # HTML转义
         log_content = log_content.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
         
-        html_content += f"""
+        log_sections_html += f"""
         <div class="file-section">
             <h3>📄 {Path(file_path).name}</h3>
             <p class="meta">共 {len(logs)} 条日志</p>
             <pre>{log_content}</pre>
 """
         if len(logs) > 200:
-            html_content += f"            <p class='meta'>... (省略 {len(logs) - 200} 行) ...</p>\n"
-        html_content += "        </div>\n"
+            log_sections_html += f"            <p class='meta'>... (省略 {len(logs) - 200} 行) ...</p>\n"
+        log_sections_html += "        </div>\n"
     
-    html_content += """
-    </div>
-</body>
-</html>
-"""
+    # 填充模板
+    html_content = html_template.format(
+        timestamp=timestamp,
+        time_window_half=time_window/2,
+        total_files=total_files,
+        total_logs=total_logs,
+        time_window=time_window,
+        log_sections=log_sections_html
+    )
     
     # 写入 HTML 文件
     with open(html_file, 'w', encoding='utf-8') as f:

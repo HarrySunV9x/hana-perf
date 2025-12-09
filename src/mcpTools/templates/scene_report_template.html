@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>场景分析报告 - {timestamp}</title>
+    <style>
+        body {{
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }}
+        .header {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }}
+        .section {{
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }}
+        h1, h2, h3 {{
+            margin-top: 0;
+        }}
+        .file-section {{
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }}
+        pre {{
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.5;
+            max-height: 400px;
+            overflow-y: auto;
+        }}
+        .meta {{
+            color: #666;
+            font-size: 14px;
+        }}
+        .stats {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }}
+        .stat-card {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }}
+        .stat-value {{
+            font-size: 32px;
+            font-weight: bold;
+        }}
+        .stat-label {{
+            font-size: 14px;
+            opacity: 0.9;
+        }}
+        .analysis-section {{
+            background: #fff9e6;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+        }}
+        .timeline {{
+            position: relative;
+            padding-left: 30px;
+        }}
+        .timeline-item {{
+            position: relative;
+            padding-bottom: 20px;
+            border-left: 2px solid #667eea;
+            padding-left: 25px;
+            margin-left: 10px;
+        }}
+        .timeline-item::before {{
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+        }}
+        .timeline-time {{
+            font-weight: bold;
+            color: #667eea;
+            font-size: 14px;
+        }}
+        .timeline-event {{
+            margin-top: 5px;
+            color: #333;
+        }}
+        .highlight {{
+            background: #fff3cd;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }}
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }}
+        th, td {{
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }}
+        th {{
+            background-color: #667eea;
+            color: white;
+        }}
+        tr:nth-child(even) {{
+            background-color: #f8f9fa;
+        }}
+        .conclusion-box {{
+            background: linear-gradient(135deg, #667eea22 0%, #764ba233 100%);
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            margin-top: 15px;
+        }}
+        .conclusion-box h3 {{
+            margin-top: 0;
+            color: #667eea;
+        }}
+        .placeholder {{
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 场景分析报告</h1>
+        <p class="meta">时间点: {timestamp} | 时间窗口: ±{time_window_half}秒</p>
+    </div>
+    
+    <div class="section">
+        <h2>📈 统计信息</h2>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value">{total_files}</div>
+                <div class="stat-label">Events 文件</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{total_logs}</div>
+                <div class="stat-label">日志条目</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{time_window}s</div>
+                <div class="stat-label">时间窗口</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SCENE_ANALYSIS_PLACEHOLDER -->
+    
+    <div class="section">
+        <h2>📝 原始日志</h2>
+{log_sections}
+    </div>
+</body>
+</html>
+

@@ -21,6 +21,8 @@ async def find_sences_by_input_focus(log_path: str, timestamp: str, time_window:
     
     Returns:
         返回详细的工作流程指导和具体的工具调用说明
+
+    ** 重要： 禁止使用命令行工具
     """
     logger.info(f"Initiating scene analysis workflow for {log_path} at {timestamp}")
     
